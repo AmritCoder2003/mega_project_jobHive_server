@@ -10,22 +10,27 @@ cloudinary.v2.config({
 });
 
 
-import jwt from "jsonwebtoken";
+
 import cookieParser from "cookie-parser";
 import fileUpload from "express-fileupload";
 import session from "express-session";
 
 import passport from "passport";
-import "./strategies/jwt-strategy.js"; // Ensure this file exists and is correctly configured
-import "./strategies/google-auth-register.js"; // Ensure the correct path
+// import "./strategies/jwt-strategy.js"; // Ensure this file exists and is correctly configured
+// import "./strategies/google-auth-register.js"; // Ensure the correct path
 
 import morgan from "morgan";
 import jobRouter from "./router/jobRouter.js";
 import userRouter from "./router/userRouter.js";
 import contactRouter from "./router/contactRouter.js";
 import applicationRouter from "./router/applicationRouter.js";
+import emailRouter from "./router/emailRouter.js";
+import profileRouter from "./router/profileRouter.js";
+import companyReviewRouter from "./router/companyReviewRouter.js";
+import interviewRouter from "./router/interviewRouter.js";
+import messageRouter from "./router/messageRouter.js";
 
-import googleAuthRouter from "./router/googleAuthRouter.js";
+// import googleAuthRouter from "./router/googleAuthRouter.js";
 // import applicationRouter from "./router/applicationRouter.js";  
 import mongoose from "mongoose";
 import { dbConnection } from "./database/dbConnection.js";
@@ -40,6 +45,7 @@ const NODE_ENV = process.env.NODE_ENV || "development";
 
 // Initialize Express app
 const app = express();
+//import {app, server, io} from "./socket/socket.js";
 
 // Middleware configuration
 if (NODE_ENV === "development") {
@@ -51,7 +57,7 @@ app.use(express.json());
 app.use(
   cors({
     origin: process.env.FRONTEND_URL,
-    methods: "GET,POST,PUT,DELETE",
+    methods: "GET,POST,PUT,DELETE,PATCH",
     credentials: true,
   })
 );
@@ -93,8 +99,16 @@ app.use("/api/v1/jobs", jobRouter);
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/contacts", contactRouter);
 app.use("/api/v1/applications", applicationRouter);
-app.use("/emp/auth", googleAuthRouter);
+app.use("/api/v1/email", emailRouter);
+app.use("/api/v1/profile", profileRouter);
+app.use("/api/v1/reviews", companyReviewRouter);
+app.use("/api/v1/interviews", interviewRouter);
+app.use("/api/v1/messages", messageRouter);
 
+// app.use("/emp/auth", googleAuthRouter);
+
+
+app.use(fileUpload());
 
 
 

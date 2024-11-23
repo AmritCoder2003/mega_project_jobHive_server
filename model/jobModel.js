@@ -36,13 +36,8 @@ const jobSchema = new mongoose.Schema({
     required: [true, 'Job Location is required'],
     minLength: [10, 'Job Location should be at least 10 characters'],
   },
-  fixedSalary: {
-    type: Number,
-    required: false,
-    min: [1000, 'Fixed Salary should be at least 4 digits'],
-    max: [999999999, 'Fixed Salary should be at most 9 digits'],
-  },
-  salaryForm: {
+  
+  salaryFrom: {
     type: Number,
     required: false,
     min: [1000, 'Salary Form should be at least 4 digits'],
@@ -53,6 +48,11 @@ const jobSchema = new mongoose.Schema({
     required: false,
     min: [1000, 'Salary To should be at least 4 digits'],
     max: [999999999, 'Salary To should be at most 9 digits'],
+  },
+  salaryPeriod: {
+    type: String,
+    enum: ['monthly', 'annual'],
+    default: 'month'
   },
   expired: {
     type: Boolean,
@@ -66,7 +66,17 @@ const jobSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: [true, 'Posted By is required']
-  }
+  },
+  type:{
+    type:String,
+    enum:['fulltime','parttime','internship'],
+    default:'fulltime'
+  },
+   workstation:{
+    type:String,
+    enum:['onsite','remote','hybrid'],
+    default:'onsite'
+   }
 }, { timestamps: true });
 
 export default mongoose.model('Job', jobSchema);

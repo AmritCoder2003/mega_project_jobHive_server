@@ -5,11 +5,22 @@ const jwtSecret = process.env.JWT_SECRET;
 import jwt from "jsonwebtoken";
 import mailSender from "../config/mailSender.js";
 import RegistrationMailOfuser from "../config/registrationmailofUser.js";
+import RegistrationMailOfEmployer from "../config/registrationmailofemployer.js";
 import { catchAsyncError } from "../middleware/catchAsyncError.js";
 import ErrorHandler from "../middleware/error.js";
 import dotenv from "dotenv";
 
+
+
 dotenv.config();
+
+export const getUser=catchAsyncError(async(req,res,next)=>{
+  const user=await User.findById(req.userId);
+  res.status(200).json({
+    success:true,
+    user
+  })
+})
 
 
 
@@ -47,7 +58,13 @@ export const createUser = catchAsyncError(async (req, res, next) => {
   try {
       await user.save();
       
-      RegistrationMailOfuser(email);
+      if(user.role==="jobseeker"){
+        RegistrationMailOfuser(user.email);
+      }
+
+      if(user.role==="employer"){
+        RegistrationMailOfEmployer(user.email);
+      }
       const token = user.getJwtToken();
       const options = {
           expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000),
@@ -58,7 +75,7 @@ export const createUser = catchAsyncError(async (req, res, next) => {
       const userWithoutPassword = user.toObject();
       delete userWithoutPassword.password;
 
-      return res.status(201).cookie("token", token, options).json({
+      return res.status(200).cookie("token", token, options).json({
           success: true,
           user: userWithoutPassword,
           token,
@@ -73,10 +90,12 @@ export const createUser = catchAsyncError(async (req, res, next) => {
 
 export const loginUser = catchAsyncError(async (req, res, next) => {
   const { email, password, role } = req.body;
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const errorMessages = errors.array().map(err => err.msg);
+    return next(new ErrorHandler(422, errorMessages));
+}
 
-  if (!email || !password || !role) {
-    return next(new ErrorHandler(422, "Please provide email, password, and role"));
-  }
 
   let existingUser;
   try {
@@ -194,15 +213,5 @@ export const passwordResetPost = async (req, res,next) => {
 };
 
 
-export const logoutUser = catchAsyncError(async (req, res, next) => {
-  res
-    .status(200)
-    .cookie("token", null, {
-      expires: new Date(Date.now()),
-      httpOnly: true,
-    })
-    .json({
-      success: true,
-      message: "Logged out successfully",
-    });
-});
+
+

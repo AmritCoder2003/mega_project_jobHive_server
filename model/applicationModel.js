@@ -54,8 +54,16 @@ const applicationSchema=new mongoose.Schema({
             enum:["employer"],
             required:true
         }
+    },
+    jobId:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"Job",  
+        required:true
+    },
+    date:{
+        type:Date,
+        default:Date.now
     }
-
 
     
 })

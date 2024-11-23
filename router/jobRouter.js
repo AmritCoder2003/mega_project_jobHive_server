@@ -6,6 +6,7 @@ import {
   createJob,
   getAllJobs,
   getAllJobsByUser,
+  getAllJobsByEmployer,
   getJob,
   updateJob,
   deleteJob,
@@ -15,7 +16,9 @@ jobRouter.get("/", getAllJobs);
 
 jobRouter.get("/user/",isAuthorized, getAllJobsByUser);
 
-jobRouter.post("/create/", [
+jobRouter.get("/employer",isAuthorized, getAllJobsByEmployer);
+
+jobRouter.post("/create", [
   check('title').not().isEmpty().withMessage('Title is required'),
   check('description').isLength({ min: 20 }).withMessage('Description should be at least 20 characters'),
   check('company').not().isEmpty().withMessage('Company is required'),
@@ -23,22 +26,28 @@ jobRouter.post("/create/", [
   check('country').not().isEmpty().withMessage('Country is required'),
   check('city').not().isEmpty().withMessage('City is required'),
   check('location').not().isEmpty().withMessage('Location is required'),
-  check('fixedSalary').optional().isNumeric().withMessage('Fixed Salary should be a number'),
-  check('salaryForm').optional().isNumeric().withMessage('Salary Form should be a number'),
-  check('salaryTo').optional().isNumeric().withMessage('Salary To should be a number'),
+  check('salaryFrom').not().isEmpty().isNumeric().withMessage('Salary Range is required'),
+  check('salaryTo').not().isEmpty().isNumeric().withMessage('Salary Range is required'),
+  check('salaryPeriod').optional().isIn(['monthly', 'annual']).withMessage('Salary Period should be either monthly or annual'),
+  check('type').optional().isIn(['fulltime', 'parttime',, 'internship']).withMessage('Type should be either fulltime, parttime or internshipship'),
+  check('workstation').optional().isIn(['remote', 'onsite', 'hybrid']).withMessage('Workstation should be either remote , onsite or hybrid' ),
+ 
 ], isAuthorized, createJob);
+
 jobRouter.get("/getJob/:id", getJob);
 jobRouter.patch("/update/:id",[
   check('title').not().isEmpty().withMessage('Title is required'),
   check('description').isLength({ min: 20 }).withMessage('Description should be at least 20 characters'),
-  check('company').not().isEmpty().withMessage('Company is required'),
   check('category').not().isEmpty().withMessage('Category is required'),
   check('country').not().isEmpty().withMessage('Country is required'),
   check('city').not().isEmpty().withMessage('City is required'),
   check('location').not().isEmpty().withMessage('Location is required'),
-  check('fixedSalary').optional().isNumeric().withMessage('Fixed Salary should be a number'),
-  check('salaryForm').optional().isNumeric().withMessage('Salary Form should be a number'),
-  check('salaryTo').optional().isNumeric().withMessage('Salary To should be a number'),
+  check('expired').not().isEmpty().withMessage('Expired is required'),
+  check('salaryFrom').not().isEmpty().isNumeric().withMessage('Salary Range is required'),
+  check('salaryTo').not().isEmpty().isNumeric().withMessage('Salary Range is required'),
+  check('salaryPeriod').optional().isIn(['monthly', 'annual']).withMessage('Salary Period should be either monthly or annual'),
+  check('type').optional().isIn(['fulltime', 'parttime',, 'internship']).withMessage('Type should be either fulltime, parttime or Internship'),
+  check('workstation').optional().isIn(['remote', 'onsite', 'hybrid']).withMessage('Workstation should be either remote , onsite or hybrid' ),
 ], isAuthorized,updateJob);
 jobRouter.delete("/delete/:id",isAuthorized, deleteJob);
 

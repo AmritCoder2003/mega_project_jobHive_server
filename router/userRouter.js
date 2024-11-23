@@ -4,13 +4,16 @@ import {isAuthorized} from "../middleware/check-auth.js"
 import {check} from "express-validator"
 const userRouter = express.Router();
 import {
+  getUser,
   createUser,
   loginUser,
   forgetPassword,
   passwordReset,
-  logoutUser,
   passwordResetPost,
 } from "../controllers/userController.js";
+
+userRouter.get("/getuser",isAuthorized,getUser);
+
 
 userRouter.post("/signup",[check('name').not().isEmpty().isLength({min:5}).withMessage('Name should be atleast 5 characters').isLength({max:20}).withMessage('Name should be atmost 20 characters'),
     check('email').isEmail().notEmpty().withMessage('Invalid email'),
@@ -37,6 +40,6 @@ userRouter.get("/passwordreset/:id/:token",passwordReset);
 
 userRouter.post("/passwordreset/:id/:token", passwordResetPost);
 
-userRouter.get("/logout",isAuthorized,logoutUser);
+
 
 export default userRouter;
